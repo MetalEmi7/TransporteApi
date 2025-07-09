@@ -1,5 +1,4 @@
-﻿// Models/Vehiculo.cs
-namespace TransporteAPI.Models
+﻿namespace TransporteAPI.Models
 {
     public class Vehiculo
     {

@@ -9,6 +9,7 @@ namespace TransporteApi.Controllers
     [Controller]
     public class VehiculosController : Controller
     {
+
         private readonly AppDbContext _context;
 
         public VehiculosController(AppDbContext context)

@@ -1,9 +1,5 @@
-﻿//namespace TransporteApi.DBContext
-
-using global::TransporteAPI.Models;
-// Data/AppDbContext.cs
+﻿using global::TransporteAPI.Models;
 using Microsoft.EntityFrameworkCore;
-//using TransporteAPI.Models;
 
 namespace TransporteAPI.Data
 {
@@ -12,7 +8,6 @@ namespace TransporteAPI.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Vehiculo> Vehiculos => Set<Vehiculo>();
-
 
     }
 }
