@@ -166,5 +166,27 @@ namespace TransporteApi.Controllers
                 return BadRequest(ex);
             }
         }
+
+
+        /// <summary>
+        /// 6. Contar cuántos vehículos hay por marca
+        /// </summary>
+        /// <returns> Marca y Modelo </returns>
+        [HttpGet("ContarCuántosVehículosHayPorMarca")]
+        public async Task<ActionResult> ContarCuántosVehículosHayPorMarca(int id)
+        {
+            try
+            {
+                var cantidadPorMarca = await _context.Vehiculos.GroupBy(v => v.Marca).Select(g => new { Marca = g.Key, Cantidad = g.Count() }).ToListAsync();                
+
+                return Ok(cantidadPorMarca);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+                return BadRequest(ex);
+            }
+        }
     }
 }
