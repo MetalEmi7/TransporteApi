@@ -71,7 +71,9 @@ namespace TransporteApi.Controllers
             try
             {
                 var Results = await _context.Vehiculos.Where(x => x.Marca == brand).ToListAsync();
-                return Ok(Results);
+                var ResultsDOS = await _context.Vehiculos.Where(x => x.Marca == brand).ToArrayAsync();
+
+                return Ok(ResultsDOS);
             }
             catch (Exception ex)
             {
@@ -133,6 +135,28 @@ namespace TransporteApi.Controllers
             try
             {
                 var Results = await _context.Vehiculos.Select(x => new { x.Modelo, x.Marca}).ToListAsync();
+                return Ok(Results);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+                return BadRequest(ex);
+            }
+        }
+
+
+
+        /// <summary>
+        /// 5. Obtener un único elemento por ID
+        /// </summary>
+        /// <returns> Marca y Modelo </returns>
+        [HttpGet("ObtenerUnicoElementoPorID")]
+        public async Task<ActionResult> ObtenerUnicoElementoPorID(int id)
+        {
+            try
+            {
+                var Results = await _context.Vehiculos.FirstOrDefaultAsync(x => x.Id == id);
                 return Ok(Results);
             }
             catch (Exception ex)
