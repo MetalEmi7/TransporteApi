@@ -250,5 +250,37 @@ namespace TransporteApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Borrar vehículos con ID en un intervalo específico.
+        /// </summary>
+        /// <param name="NumInicio">ID inicial del intervalo.</param>
+        /// <param name="NumFinal">ID final del intervalo.</param>
+        /// <returns>Resultado de la operación.</returns>
+        [HttpDelete("BorrarVehiculosConIntervaloId")]
+        public async Task<ActionResult> BorrarVehiculosConIntervaloId(int NumInicio, int NumFinal)
+        {
+            try
+            {
+                // Obtenemos los vehículos dentro del intervalo especificado.
+                var vehiculosABorrar = await _context.Vehiculos
+                    .Where(v => v.Id >= NumInicio && v.Id <= NumFinal)
+                    .ToListAsync();
+
+                if (!(vehiculosABorrar.Count() > 0))
+                {
+                    return NotFound("No se encontraron vehículos en el intervalo especificado.");
+                }
+
+                // Eliminamos los vehículos encontrados.
+                _context.Vehiculos.RemoveRange(vehiculosABorrar);
+                await _context.SaveChangesAsync();
+
+                return Ok($"Se eliminaron {vehiculosABorrar.Count} vehículos en el intervalo de ID {NumInicio} a {NumFinal}.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Ocurrió un error: {ex.Message}");
+            }
+        }
     }
 }
