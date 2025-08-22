@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransporteApi", "TransporteApi\TransporteApi.csproj", "{1A901800-054E-444A-B0A3-40DE1CEFE1FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBase", "DataBase\DataBase.csproj", "{406E4DD9-090C-46DA-816D-1B156C5BA533}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{1A901800-054E-444A-B0A3-40DE1CEFE1FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A901800-054E-444A-B0A3-40DE1CEFE1FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A901800-054E-444A-B0A3-40DE1CEFE1FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{406E4DD9-090C-46DA-816D-1B156C5BA533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{406E4DD9-090C-46DA-816D-1B156C5BA533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{406E4DD9-090C-46DA-816D-1B156C5BA533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{406E4DD9-090C-46DA-816D-1B156C5BA533}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

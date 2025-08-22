@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TransporteAPI.Data;
@@ -24,7 +25,12 @@ namespace TransporteApi.Controllers
         [HttpGet("GetById")]
         public async Task<ActionResult<Vehiculo>> GetById(int id)
         {
-            var vehiculo = await _context.Vehiculos.FindAsync(id);
+            ////Obtengo utilizando metodo del CORE
+            //var vehiculo = await _context.Vehiculos.FindAsync(id);
+
+            //Ejecucion de SP
+            var vehiculo = await _context.Vehiculos.FromSqlRaw("EXEC [dbo].[sp_ObtenerVehiculoPorId] @Id = " + id ).ToListAsync();
+
             return vehiculo == null ? NotFound() : Ok(vehiculo);
         }
 
@@ -44,9 +50,18 @@ namespace TransporteApi.Controllers
                 return BadRequest();
             }
 
+            StringBuilder SB = new StringBuilder();
+
+            SB.AppendLine("EXEC UpdateVehiculo");
+            SB.AppendLine(vehiculo.Modelo != null ?"@Modelo" + vehiculo.Modelo : "");
+            SB.AppendLine(vehiculo.Marca != null ? "@Marca" + vehiculo.Marca : "");
+            SB.AppendLine(vehiculo.Anio != null ? "@Anio" + vehiculo.Anio : "");
+
+            _context.Vehiculos.FromSqlRaw(SB.ToString());
+
             _context.Entry(vehiculo).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            
+
             return NoContent();
         }
 
@@ -54,10 +69,13 @@ namespace TransporteApi.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             var vehiculo = await _context.Vehiculos.FindAsync(id);
+
             if (vehiculo == null) return NotFound();
+
             _context.Vehiculos.Remove(vehiculo);
             await _context.SaveChangesAsync();
             return NoContent();
+
         }
 
         /// <summary>
@@ -66,10 +84,18 @@ namespace TransporteApi.Controllers
         /// <param name="brand"></param>
         /// <returns></returns>
         [HttpGet("GetVehicleByBrand")]
-        public async Task<ActionResult> GetVehicleByBrand (string brand)
+        public async Task<ActionResult> GetVehicleByBrand(string brand)
         {
             try
             {
+                /* * Buscamos vehículos por marca. 
+                 * 
+                 * Ejemplo: 
+                 * 
+                 * GET /api/Vehiculos/GetVehicleByBrand?brand=Toyota
+                 * 
+                 * Retorna todos los vehículos de la marca Toyota.
+                 */
                 var Results = await _context.Vehiculos.Where(x => x.Marca == brand).ToListAsync();
                 var ResultsDOS = await _context.Vehiculos.Where(x => x.Marca == brand).ToArrayAsync();
 
@@ -93,6 +119,7 @@ namespace TransporteApi.Controllers
         {
             try
             {
+                /* * Buscamos vehículos cuyo modelo contenga la palabra proporcionada. */
                 var Results = await _context.Vehiculos.Where(x => x.Modelo.Contains(palabra)).ToListAsync();
                 return Ok(Results);
             }
@@ -113,17 +140,17 @@ namespace TransporteApi.Controllers
         {
             try
             {
+                /* * Ordenamos los vehículos por año de forma descendente. */
                 var Results = await _context.Vehiculos.OrderByDescending(x => x.Anio).ToListAsync();
                 return Ok(Results);
             }
             catch (Exception ex)
             {
 
-                throw;
+                throw new Exception(ex.Message);
                 return BadRequest(ex);
             }
         }
-
 
         /// <summary>
         /// 4. Seleccionar solo algunas propiedades (proyección)
@@ -134,7 +161,8 @@ namespace TransporteApi.Controllers
         {
             try
             {
-                var Results = await _context.Vehiculos.Select(x => new { x.Modelo, x.Marca}).ToListAsync();
+                /* * Seleccionamos solo algunas propiedades de los vehículos, en este caso Marca y Modelo. */
+                var Results = await _context.Vehiculos.Select(x => new { x.Modelo, x.Marca }).ToListAsync();
                 return Ok(Results);
             }
             catch (Exception ex)
@@ -145,8 +173,6 @@ namespace TransporteApi.Controllers
             }
         }
 
-
-
         /// <summary>
         /// 5. Obtener un único elemento por ID
         /// </summary>
@@ -156,6 +182,8 @@ namespace TransporteApi.Controllers
         {
             try
             {
+                /* * Obtenemos un único elemento por ID. */
+
                 var Results = await _context.Vehiculos.FirstOrDefaultAsync(x => x.Id == id);
                 return Ok(Results);
             }
@@ -167,7 +195,6 @@ namespace TransporteApi.Controllers
             }
         }
 
-
         /// <summary>
         /// 6. Contar cuántos vehículos hay por marca
         /// </summary>
@@ -177,16 +204,51 @@ namespace TransporteApi.Controllers
         {
             try
             {
-                var cantidadPorMarca = await _context.Vehiculos.GroupBy(v => v.Marca).Select(g => new { Marca = g.Key, Cantidad = g.Count() }).ToListAsync();                
+                /* * Agrupamos los vehículos por marca y contamos cuántos hay de cada una.
+                 * 
+                 * Resultado de ejemplo: 
+                 * 
+                 * Marca: Toyota
+                 * Cantidad: 5
+                 * 
+                 * Marca: Ford
+                 * Cantidad: 3
+                 */
+
+                var cantidadPorMarca = await _context.Vehiculos.GroupBy(v => v.Marca)
+                    .Select(g => new { Marca = g.Key, Cantidad = g.Count() }).ToListAsync();
+
+                /*
+                 * Key: Marca
+                 * Cantidad: Cantidad de vehículos por marca
+                 */
 
                 return Ok(cantidadPorMarca);
             }
             catch (Exception ex)
             {
-
                 throw;
                 return BadRequest(ex);
             }
         }
+
+        /// <summary>
+        ///  8.Obtener los 5 vehículos más nuevos
+        /// </summary>
+        /// <returns> Marca y Modelo </returns>
+        [HttpGet("Obtener5VehículosMásNuevos")]
+        public async Task<ActionResult> Obtener5VehículosMásNuevos()
+        {
+            try
+            {
+                var resultado = await _context.Vehiculos.OrderByDescending(x => x.Anio).Take(5).ToArrayAsync();
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
     }
 }
